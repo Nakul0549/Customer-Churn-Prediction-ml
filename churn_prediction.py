@@ -7,6 +7,12 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier, GradientBoostingClassifier
+from xgboost import XGBClassifier
+import pickle 
 
 df = pd.read_csv("WA_Fn-UseC_-Telco-Customer-Churn.csv")
 # print(df.head())
@@ -62,19 +68,57 @@ X_test_scaled = scaler.fit_transform(X_test)
 lr_model = LogisticRegression(random_state=42, max_iter=1000, class_weight='balanced')
 lr_model.fit(X_train_scaled, y_train)
 y_pred_lr = lr_model.predict(X_test_scaled)
-
-# print(accuracy_score(y_test, y_pred))       #//0.8051
+# print(accuracy_score(y_test, y_pred))       
 # print(classification_report(y_test, y_pred))
 
 nb_model = GaussianNB()
 nb_model.fit(X_train, y_train)
 y_pred_nb = nb_model.predict(X_test)
-
-# print("Accuracy: ",accuracy_score(y_test, y_pred_nb))   #65.16%
+# print("Accuracy: ",accuracy_score(y_test, y_pred_nb)) 
 # print(classification_report(y_test, y_pred_nb))
 
 knn_model = KNeighborsClassifier(n_neighbors=5, p=2)
 knn_model.fit(X_train_scaled, y_train)
 y_pred_knn = knn_model.predict(X_test_scaled)
-print("Accuracy: ",accuracy_score(y_test,y_pred_knn))
-print(classification_report(y_test,y_pred_knn))     #76.34%
+# print("Accuracy: ",accuracy_score(y_test,y_pred_knn))
+# print(classification_report(y_test,y_pred_knn))    
+
+dt_model = DecisionTreeClassifier(random_state=42,criterion='entropy',max_depth=10,max_features='sqrt')
+dt_model.fit(X_train, y_train)
+y_pred_dt = dt_model.predict(X_test)
+# print("Accuracy: ",accuracy_score(y_test,y_pred_dt))
+# print(classification_report(y_test,y_pred_dt))
+
+smv_model = SVC(class_weight='balanced',C=1,kernel='rbf',max_iter=10000, random_state=42)
+smv_model.fit(X_train_scaled, y_train)
+y_pred_svm = smv_model.predict(X_test_scaled)
+# print("Accuracy: ",accuracy_score(y_test,y_pred_svm))
+# print(classification_report(y_test,y_pred_svm))
+
+rf_clf = RandomForestClassifier(n_estimators=200, max_depth=10, class_weight='balanced', random_state=42)
+rf_clf.fit(X_train,y_train)
+y_pred_rf = rf_clf.predict(X_test)
+# print("Accuracy: ",accuracy_score(y_test,y_pred_rf))
+# print(classification_report(y_test,y_pred_rf))
+
+ada_model = AdaBoostClassifier(n_estimators=200, random_state=42)
+ada_model.fit(X_train, y_train)
+y_pred_ada = ada_model.predict(X_test)
+# print("Accuracy: ",accuracy_score(y_test,y_pred_ada))
+# print(classification_report(y_test,y_pred_ada))
+
+gb_model = GradientBoostingClassifier(n_estimators=200, random_state=42)
+gb_model.fit(X_train, y_train)
+y_pred_gb = gb_model.predict(X_test)
+# print("Accuracy: ",accuracy_score(y_test,y_pred_gb))
+# print(classification_report(y_test,y_pred_gb))
+
+xgb_model = XGBClassifier()
+xgb_model.fit(X_train, y_train)
+y_pred_xgb = xgb_model.predict(X_test)
+# print("Accuracy: ",accuracy_score(y_test,y_pred_xgb))
+# print(classification_report(y_test,y_pred_xgb))
+
+pickle.dump(lr_model, open("model.pkl", "wb"))
+pickle.dump(scaler, open("scaler.pkl", "wb"))
+pickle.dump(X.columns, open("columns.pkl", "wb"))
